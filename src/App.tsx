@@ -22,12 +22,12 @@ function App() {
         
         <div className="grid lg:grid-cols-2 gap-8 max-w-7xl mx-auto">
           {/* Logo Canvas */}
-          <div className="flex justify-center">
+          <div className="flex justify-center lg:col-span-2">
             <LogoCanvas selectedColor={selectedColor} />
           </div>
 
           {/* Color Picker */}
-          <div className="flex justify-center lg:justify-start">
+          <div className="flex justify-center lg:col-span-2">
             <ColorPicker
               selectedColor={selectedColor}
               onColorChange={handleColorChange}

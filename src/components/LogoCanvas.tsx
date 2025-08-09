@@ -239,15 +239,15 @@ Gprove @Succinctlabs #CreativeChallenge`;
   };
   return (
     <div className="flex flex-col items-center gap-6">
-      <div className="bg-white rounded-2xl shadow-lg p-12">
-        <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-12 flex items-center justify-center">
+      <div className="bg-white rounded-2xl shadow-lg p-16">
+        <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-16 flex items-center justify-center">
           <svg 
-            width="369" 
-            height="124" 
+            width="590" 
+            height="200" 
             viewBox="0 0 738 248" 
             fill="none" 
             xmlns="http://www.w3.org/2000/svg"
-            className="drop-shadow-lg"
+            className="drop-shadow-xl"
           >
             <path
               d="M287.295 175.68V72H309.268V175.68H287.295Z"
@@ -311,13 +311,13 @@ Gprove @Succinctlabs #CreativeChallenge`;
 
       <div className="text-center space-y-4">
         <p className="text-gray-600 text-sm">
-          Click on different parts of the INCO logo to color them
+          Click on different parts of the INCO logo to color them with your selected color
         </p>
         
         <div className="flex gap-3 justify-center">
           <button
             onClick={resetColors}
-            className="px-4 py-2 text-blue-600 hover:text-blue-800 text-sm font-medium transition-colors border border-blue-200 rounded-lg hover:bg-blue-50"
+            className="px-6 py-3 text-blue-600 hover:text-blue-800 text-base font-medium transition-colors border border-blue-200 rounded-lg hover:bg-blue-50"
           >
             Reset Colors
           </button>
@@ -326,34 +326,34 @@ Gprove @Succinctlabs #CreativeChallenge`;
             <>
               <button
                 onClick={copyLogoToClipboard}
-                className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-colors border ${
+                className={`flex items-center gap-2 px-6 py-3 text-base font-medium rounded-lg transition-colors border ${
                   copied 
                     ? 'bg-green-50 border-green-200 text-green-700' 
                     : 'bg-gray-50 border-gray-200 text-gray-700 hover:bg-gray-100'
                 }`}
               >
-                {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                {copied ? <Check className="w-5 h-5" /> : <Copy className="w-5 h-5" />}
                 {copied ? 'Copied!' : 'Copy Logo'}
               </button>
               
               <button
                 onClick={downloadLogo}
                 disabled={downloading}
-                className={`flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-colors border ${
+                className={`flex items-center gap-2 px-6 py-3 text-base font-medium rounded-lg transition-colors border ${
                   downloading
                     ? 'bg-gray-50 border-gray-200 text-gray-400 cursor-not-allowed'
                     : 'bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100'
                 }`}
               >
-                <Download className="w-4 h-4" />
+                <Download className="w-5 h-5" />
                 {downloading ? 'Downloading...' : 'Download'}
               </button>
               
               <button
                 onClick={shareOnX}
-                className="flex items-center gap-2 px-4 py-2 bg-black hover:bg-gray-800 text-white text-sm font-medium rounded-lg transition-colors"
+                className="flex items-center gap-2 px-6 py-3 bg-black hover:bg-gray-800 text-white text-base font-medium rounded-lg transition-colors"
               >
-                <Share className="w-4 h-4" />
+                <Share className="w-5 h-5" />
                 Share on X
               </button>
             </>
