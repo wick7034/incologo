@@ -108,6 +108,7 @@ const LogoCanvas: React.FC<LogoCanvasProps> = ({ selectedColor, onLogoSaved }) =
 
   const shareOnX = () => {
     const shareOnX = (username?: string) => {
+    }
     const tweetText = `🎨 Just created my own version of the INCO logo!
 
 Try creating your own colorful version at: 
