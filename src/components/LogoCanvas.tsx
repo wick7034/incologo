@@ -239,8 +239,8 @@ Gprove @Succinctlabs #CreativeChallenge`;
   };
   return (
     <div className="flex flex-col items-center gap-6">
-      <div className="bg-white rounded-2xl shadow-lg p-16">
-        <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-16 flex items-center justify-center">
+      <div className="bg-white rounded-2xl shadow-lg p-8">
+        <div className="bg-gradient-to-br from-gray-50 to-gray-100 rounded-xl p-8 flex items-center justify-center">
           <svg 
             width="590" 
             height="200" 

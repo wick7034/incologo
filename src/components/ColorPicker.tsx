@@ -32,16 +32,16 @@ const ColorPicker: React.FC<ColorPickerProps> = ({ selectedColor, onColorChange,
   ];
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-2xl">
+    <div className="bg-white rounded-2xl shadow-lg p-6 w-full max-w-lg">
       <div className="flex items-center gap-3 mb-6">
         <Palette className="w-6 h-6 text-gray-700" />
-        <h2 className="text-2xl font-semibold text-gray-800">Color Picker</h2>
+        <h2 className="text-xl font-semibold text-gray-800">Color Picker</h2>
       </div>
 
-      <div className="space-y-8">
+      <div className="space-y-6">
         {/* Custom Color Input */}
         <div>
-          <label className="block text-base font-medium text-gray-700 mb-3">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
             Custom Color
           </label>
           <div className="flex items-center gap-3">
@@ -49,13 +49,13 @@ const ColorPicker: React.FC<ColorPickerProps> = ({ selectedColor, onColorChange,
               type="color"
               value={selectedColor}
               onChange={(e) => onColorChange(e.target.value)}
-              className="w-16 h-16 rounded-lg border-2 border-gray-200 cursor-pointer shadow-sm hover:shadow-md transition-shadow"
+              className="w-12 h-12 rounded-lg border-2 border-gray-200 cursor-pointer shadow-sm hover:shadow-md transition-shadow"
             />
             <input
               type="text"
               value={selectedColor}
               onChange={(e) => onColorChange(e.target.value)}
-              className="flex-1 px-4 py-3 text-lg border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="flex-1 px-3 py-2 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
               placeholder="#FE11C5"
             />
           </div>
@@ -63,15 +63,15 @@ const ColorPicker: React.FC<ColorPickerProps> = ({ selectedColor, onColorChange,
 
         {/* Preset Colors */}
         <div>
-          <label className="block text-base font-medium text-gray-700 mb-4">
+          <label className="block text-sm font-medium text-gray-700 mb-3">
             Preset Colors
           </label>
-          <div className="grid grid-cols-10 gap-3 max-h-80 overflow-y-auto">
+          <div className="grid grid-cols-8 gap-2 max-h-64 overflow-y-auto">
             {presetColors.map((color, index) => (
               <button
                 key={index}
                 onClick={() => onColorChange(color)}
-                className={`w-12 h-12 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:scale-110 hover:shadow-lg ${
+                className={`w-10 h-10 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:scale-110 hover:shadow-lg ${
                   selectedColor === color ? 'border-gray-800 ring-2 ring-blue-500' : 'border-gray-200'
                 }`}
                 style={{ backgroundColor: color }}
@@ -84,7 +84,7 @@ const ColorPicker: React.FC<ColorPickerProps> = ({ selectedColor, onColorChange,
         {/* Reset Button */}
         <button
           onClick={onReset}
-          className="w-full flex items-center justify-center gap-2 px-6 py-4 text-lg bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition-colors duration-200"
+          className="w-full flex items-center justify-center gap-2 px-4 py-3 text-base bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition-colors duration-200"
         >
           <RotateCcw className="w-5 h-5" />
           Reset to Original
