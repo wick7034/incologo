@@ -1,11 +1,14 @@
 import React, { useState } from 'react';
 import { Share, Copy, Check, Download } from 'lucide-react';
+import { supabase } from '../lib/supabase';
+import UsernameModal from './UsernameModal';
 
 interface LogoCanvasProps {
   selectedColor: string;
+  onLogoSaved?: () => void;
 }
 
-const LogoCanvas: React.FC<LogoCanvasProps> = ({ selectedColor }) => {
+const LogoCanvas: React.FC<LogoCanvasProps> = ({ selectedColor, onLogoSaved }) => {
   const [pathColors, setPathColors] = useState({
     background: '#3673F5',
     text: '#3673F5',
@@ -17,6 +20,8 @@ const LogoCanvas: React.FC<LogoCanvasProps> = ({ selectedColor }) => {
   const [hoveredPath, setHoveredPath] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [downloading, setDownloading] = useState(false);
+  const [showUsernameModal, setShowUsernameModal] = useState(false);
+  const [pendingAction, setPendingAction] = useState<'copy' | 'download' | 'share' | null>(null);
 
   const handlePathClick = (pathId: string) => {
     setPathColors(prev => ({
@@ -53,15 +58,63 @@ const LogoCanvas: React.FC<LogoCanvasProps> = ({ selectedColor }) => {
            pathColors.line3 !== '#FFFFFF';
   };
 
+  const saveLogoToDatabase = async (username: string) => {
+    try {
+      const { error } = await supabase
+        .from('user_logos')
+        .insert([
+          {
+            x_username: username,
+            logo_colors: pathColors
+          }
+        ]);
+
+      if (error) throw error;
+      
+      // Call the callback to refresh the gallery
+      if (onLogoSaved) {
+        onLogoSaved();
+      }
+    } catch (error) {
+      console.error('Error saving logo:', error);
+      throw error;
+    }
+  };
+
+  const handleActionWithUsername = async (username: string) => {
+    // Save to database first
+    await saveLogoToDatabase(username);
+    
+    // Then perform the requested action
+    switch (pendingAction) {
+      case 'copy':
+        await copyLogoToClipboard();
+        break;
+      case 'download':
+        await downloadLogo();
+        break;
+      case 'share':
+        shareOnX(username);
+        break;
+    }
+    
+    setPendingAction(null);
+  };
+
+  const requestUsername = (action: 'copy' | 'download' | 'share') => {
+    setPendingAction(action);
+    setShowUsernameModal(true);
+  };
+
   const shareOnX = () => {
-    const colors = Object.values(pathColors).join(', ');
-    const tweetText = `🎨 Just created my own version of the Succinct logo!
+    const shareOnX = (username?: string) => {
+    const tweetText = `🎨 Just created my own version of the INCO logo!
 
 Try creating your own colorful version at: 
 
-https://succinctcolors.netlify.app/
+${window.location.origin}
 
-Gprove @Succinctlabs #CreativeChallenge`;
+${username ? `Created by @${username}` : ''} #INCOColors #CreativeChallenge`;
     
     const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`;
     window.open(twitterUrl, '_blank', 'width=550,height=420');
@@ -326,6 +379,7 @@ Gprove @Succinctlabs #CreativeChallenge`;
             <>
               <button
                 onClick={copyLogoToClipboard}
+                onClick={() => requestUsername('copy')}
                 className={`flex items-center gap-2 px-6 py-3 text-base font-medium rounded-lg transition-colors border ${
                   copied 
                     ? 'bg-green-50 border-green-200 text-green-700' 
@@ -338,6 +392,7 @@ Gprove @Succinctlabs #CreativeChallenge`;
               
               <button
                 onClick={downloadLogo}
+                onClick={() => requestUsername('download')}
                 disabled={downloading}
                 className={`flex items-center gap-2 px-6 py-3 text-base font-medium rounded-lg transition-colors border ${
                   downloading
@@ -351,6 +406,7 @@ Gprove @Succinctlabs #CreativeChallenge`;
               
               <button
                 onClick={shareOnX}
+                onClick={() => requestUsername('share')}
                 className="flex items-center gap-2 px-6 py-3 bg-black hover:bg-gray-800 text-white text-base font-medium rounded-lg transition-colors"
               >
                 <Share className="w-5 h-5" />
@@ -360,6 +416,16 @@ Gprove @Succinctlabs #CreativeChallenge`;
           )}
         </div>
       </div>
+      
+      <UsernameModal
+        isOpen={showUsernameModal}
+        onClose={() => {
+          setShowUsernameModal(false);
+          setPendingAction(null);
+        }}
+        onSubmit={handleActionWithUsername}
+        action={pendingAction || 'copy'}
+      />
     </div>
   );
 };
