@@ -1,14 +1,15 @@
 import React, { useState } from 'react';
-import { Share, Copy, Check, Download } from 'lucide-react';
+import { Share, Copy, Check, Download, Lock } from 'lucide-react';
 import { supabase } from '../lib/supabase';
-import UsernameModal from './UsernameModal';
 
 interface LogoCanvasProps {
   selectedColor: string;
-  onLogoSaved?: () => void;
+  onLogoSaved: () => void;
+  isAuthenticated: boolean;
+  username: string | null;
 }
 
-const LogoCanvas: React.FC<LogoCanvasProps> = ({ selectedColor, onLogoSaved }) => {
+const LogoCanvas: React.FC<LogoCanvasProps> = ({ selectedColor, onLogoSaved, isAuthenticated, username }) => {
   const [pathColors, setPathColors] = useState({
     background: '#3673F5',
     text: '#3673F5',
@@ -20,10 +21,10 @@ const LogoCanvas: React.FC<LogoCanvasProps> = ({ selectedColor, onLogoSaved }) =
   const [hoveredPath, setHoveredPath] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [downloading, setDownloading] = useState(false);
-  const [showUsernameModal, setShowUsernameModal] = useState(false);
-  const [pendingAction, setPendingAction] = useState<'copy' | 'download' | 'share' | null>(null);
 
   const handlePathClick = (pathId: string) => {
+    if (!isAuthenticated) return;
+    
     setPathColors(prev => ({
       ...prev,
       [pathId]: selectedColor
@@ -58,7 +59,9 @@ const LogoCanvas: React.FC<LogoCanvasProps> = ({ selectedColor, onLogoSaved }) =
            pathColors.line3 !== '#FFFFFF';
   };
 
-  const saveLogoToDatabase = async (username: string) => {
+  const saveLogoToDatabase = async () => {
+    if (!username) return;
+    
     try {
       const { error } = await supabase
         .from('user_logos')
@@ -72,21 +75,21 @@ const LogoCanvas: React.FC<LogoCanvasProps> = ({ selectedColor, onLogoSaved }) =
       if (error) throw error;
       
       // Call the callback to refresh the gallery
-      if (onLogoSaved) {
-        onLogoSaved();
-      }
+      onLogoSaved();
     } catch (error) {
       console.error('Error saving logo:', error);
       throw error;
     }
   };
 
-  const handleActionWithUsername = async (username: string) => {
+  const handleAction = async (action: 'copy' | 'download' | 'share') => {
+    if (!isAuthenticated || !username) return;
+    
     // Save to database first
-    await saveLogoToDatabase(username);
+    await saveLogoToDatabase();
     
     // Then perform the requested action
-    switch (pendingAction) {
+    switch (action) {
       case 'copy':
         await copyLogoToClipboard();
         break;
@@ -94,21 +97,12 @@ const LogoCanvas: React.FC<LogoCanvasProps> = ({ selectedColor, onLogoSaved }) =
         await downloadLogo();
         break;
       case 'share':
-        shareOnX(username);
+        shareOnX();
         break;
     }
-    
-    setPendingAction(null);
-  };
-
-  const requestUsername = (action: 'copy' | 'download' | 'share') => {
-    setPendingAction(action);
-    setShowUsernameModal(true);
   };
 
   const shareOnX = () => {
-    const shareOnX = (username?: string) => {
-    }
     const tweetText = `🎨 Just created my own version of the INCO logo!
 
 Try creating your own colorful version at: 
@@ -366,70 +360,66 @@ ${username ? `Created by @${username}` : ''} #INCOColors #CreativeChallenge`;
         </div>
       </div>
 
-      <div className="text-center space-y-4">
-        <p className="text-gray-600 text-sm">
-          Click on different parts of the INCO logo to color them with your selected color
-        </p>
-        
-        <div className="flex gap-3 justify-center">
-          <button
-            onClick={resetColors}
-            className="px-6 py-3 text-blue-600 hover:text-blue-800 text-base font-medium transition-colors border border-blue-200 rounded-lg hover:bg-blue-50"
-          >
-            Reset Colors
-          </button>
-          
-          {hasCustomColors() && (
-            <>
-              <button
-                onClick={copyLogoToClipboard}
-                onClick={() => requestUsername('copy')}
-                className={`flex items-center gap-2 px-6 py-3 text-base font-medium rounded-lg transition-colors border ${
-                  copied 
-                    ? 'bg-green-50 border-green-200 text-green-700' 
-                    : 'bg-gray-50 border-gray-200 text-gray-700 hover:bg-gray-100'
-                }`}
-              >
-                {copied ? <Check className="w-5 h-5" /> : <Copy className="w-5 h-5" />}
-                {copied ? 'Copied!' : 'Copy Logo'}
-              </button>
-              
-              <button
-                onClick={downloadLogo}
-                onClick={() => requestUsername('download')}
-                disabled={downloading}
-                className={`flex items-center gap-2 px-6 py-3 text-base font-medium rounded-lg transition-colors border ${
-                  downloading
-                    ? 'bg-gray-50 border-gray-200 text-gray-400 cursor-not-allowed'
-                    : 'bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100'
-                }`}
-              >
-                <Download className="w-5 h-5" />
-                {downloading ? 'Downloading...' : 'Download'}
-              </button>
-              
-              <button
-                onClick={shareOnX}
-                onClick={() => requestUsername('share')}
-                className="flex items-center gap-2 px-6 py-3 bg-black hover:bg-gray-800 text-white text-base font-medium rounded-lg transition-colors"
-              >
-                <Share className="w-5 h-5" />
-                Share on X
-              </button>
-            </>
-          )}
+      {!isAuthenticated ? (
+        <div className="text-center space-y-4">
+          <div className="flex items-center justify-center gap-2 text-gray-500 mb-4">
+            <Lock className="w-5 h-5" />
+            <p className="text-sm">Login with your X username to start creating</p>
+          </div>
         </div>
-      </div>
-      
-      <UsernameModal
-        isOpen={showUsernameModal}
-        onClose={() => {
-          setShowUsernameModal(false);
-          setPendingAction(null);
-        }}
-        onSubmit={handleActionWithUsername}
-        action={pendingAction || 'copy'}
-      />
+      ) : (
+        <div className="text-center space-y-4">
+          <p className="text-gray-600 text-sm">
+            Welcome @{username}! Click on different parts of the INCO logo to color them with your selected color
+          </p>
+        
+          <div className="flex gap-3 justify-center">
+            <button
+              onClick={resetColors}
+              className="px-6 py-3 text-blue-600 hover:text-blue-800 text-base font-medium transition-colors border border-blue-200 rounded-lg hover:bg-blue-50"
+            >
+              Reset Colors
+            </button>
+          
+            {hasCustomColors() && (
+              <>
+                <button
+                  onClick={() => handleAction('copy')}
+                  className={`flex items-center gap-2 px-6 py-3 text-base font-medium rounded-lg transition-colors border ${
+                    copied 
+                      ? 'bg-green-50 border-green-200 text-green-700' 
+                      : 'bg-gray-50 border-gray-200 text-gray-700 hover:bg-gray-100'
+                  }`}
+                >
+                  {copied ? <Check className="w-5 h-5" /> : <Copy className="w-5 h-5" />}
+                  {copied ? 'Copied!' : 'Copy Logo'}
+                </button>
+              
+                <button
+                  onClick={() => handleAction('download')}
+                  disabled={downloading}
+                  className={`flex items-center gap-2 px-6 py-3 text-base font-medium rounded-lg transition-colors border ${
+                    downloading
+                      ? 'bg-gray-50 border-gray-200 text-gray-400 cursor-not-allowed'
+                      : 'bg-blue-50 border-blue-200 text-blue-700 hover:bg-blue-100'
+                  }`}
+                >
+                  <Download className="w-5 h-5" />
+                  {downloading ? 'Downloading...' : 'Download'}
+                </button>
+              
+                <button
+                  onClick={() => handleAction('share')}
+                  className="flex items-center gap-2 px-6 py-3 bg-black hover:bg-gray-800 text-white text-base font-medium rounded-lg transition-colors"
+                >
+                  <Share className="w-5 h-5" />
+                  Share on X
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

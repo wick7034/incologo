@@ -1,13 +1,14 @@
 import React from 'react';
-import { Palette, RotateCcw } from 'lucide-react';
+import { Palette, RotateCcw, Lock } from 'lucide-react';
 
 interface ColorPickerProps {
   selectedColor: string;
   onColorChange: (color: string) => void;
   onReset: () => void;
+  isAuthenticated: boolean;
 }
 
-const ColorPicker: React.FC<ColorPickerProps> = ({ selectedColor, onColorChange, onReset }) => {
+const ColorPicker: React.FC<ColorPickerProps> = ({ selectedColor, onColorChange, onReset, isAuthenticated }) => {
   const presetColors = [
     // Original and vibrant colors
     '#FE11C5', '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFEAA7',
@@ -32,11 +33,20 @@ const ColorPicker: React.FC<ColorPickerProps> = ({ selectedColor, onColorChange,
   ];
 
   return (
-    <div className="bg-white rounded-2xl shadow-lg p-6 w-full max-w-lg">
+    <div className={`bg-white rounded-2xl shadow-lg p-6 w-full max-w-lg ${!isAuthenticated ? 'opacity-60' : ''}`}>
       <div className="flex items-center gap-3 mb-6">
         <Palette className="w-6 h-6 text-gray-700" />
         <h2 className="text-xl font-semibold text-gray-800">Color Picker</h2>
+        {!isAuthenticated && <Lock className="w-5 h-5 text-gray-400 ml-auto" />}
       </div>
+
+      {!isAuthenticated && (
+        <div className="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+          <p className="text-gray-600 text-sm text-center">
+            Login with your X username to start customizing colors
+          </p>
+        </div>
+      )}
 
       <div className="space-y-6">
         {/* Custom Color Input */}
@@ -49,14 +59,16 @@ const ColorPicker: React.FC<ColorPickerProps> = ({ selectedColor, onColorChange,
               type="color"
               value={selectedColor}
               onChange={(e) => onColorChange(e.target.value)}
-              className="w-12 h-12 rounded-lg border-2 border-gray-200 cursor-pointer shadow-sm hover:shadow-md transition-shadow"
+              className="w-12 h-12 rounded-lg border-2 border-gray-200 cursor-pointer shadow-sm hover:shadow-md transition-shadow disabled:cursor-not-allowed disabled:opacity-50"
+              disabled={!isAuthenticated}
             />
             <input
               type="text"
               value={selectedColor}
               onChange={(e) => onColorChange(e.target.value)}
-              className="flex-1 px-3 py-2 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="flex-1 px-3 py-2 text-base border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
               placeholder="#FE11C5"
+              disabled={!isAuthenticated}
             />
           </div>
         </div>
@@ -71,11 +83,16 @@ const ColorPicker: React.FC<ColorPickerProps> = ({ selectedColor, onColorChange,
               <button
                 key={index}
                 onClick={() => onColorChange(color)}
-                className={`w-10 h-10 rounded-lg border-2 cursor-pointer transition-all duration-200 hover:scale-110 hover:shadow-lg ${
+                className={`w-10 h-10 rounded-lg border-2 transition-all duration-200 ${
+                  isAuthenticated 
+                    ? 'cursor-pointer hover:scale-110 hover:shadow-lg' 
+                    : 'cursor-not-allowed opacity-50'
+                } ${
                   selectedColor === color ? 'border-gray-800 ring-2 ring-blue-500' : 'border-gray-200'
                 }`}
                 style={{ backgroundColor: color }}
                 title={color}
+                disabled={!isAuthenticated}
               />
             ))}
           </div>
@@ -84,7 +101,8 @@ const ColorPicker: React.FC<ColorPickerProps> = ({ selectedColor, onColorChange,
         {/* Reset Button */}
         <button
           onClick={onReset}
-          className="w-full flex items-center justify-center gap-2 px-4 py-3 text-base bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition-colors duration-200"
+          className="w-full flex items-center justify-center gap-2 px-4 py-3 text-base bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium rounded-lg transition-colors duration-200 disabled:cursor-not-allowed disabled:opacity-50"
+          disabled={!isAuthenticated}
         >
           <RotateCcw className="w-5 h-5" />
           Reset to Original
