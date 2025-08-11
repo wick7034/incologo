@@ -1,11 +1,10 @@
 import React, { useState } from 'react';
 import { X, User, AlertCircle, LogIn } from 'lucide-react';
-import { authenticateWithSupabase } from '../lib/auth';
 
 interface LoginModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onLogin: (authState: any) => void;
+  onLogin: (username: string) => void;
 }
 
 const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLogin }) => {
@@ -32,11 +31,10 @@ const LoginModal: React.FC<LoginModalProps> = ({ isOpen, onClose, onLogin }) => 
 
     setIsSubmitting(true);
     try {
-      const authState = await authenticateWithSupabase(cleanUsername);
-      onLogin(authState);
+      onLogin(cleanUsername);
       setUsername('');
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to login. Please try again.');
+      setError('Failed to login. Please try again.');
     } finally {
       setIsSubmitting(false);
     }

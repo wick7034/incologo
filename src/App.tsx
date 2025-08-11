@@ -4,7 +4,7 @@ import LogoCanvas from './components/LogoCanvas';
 import ColorPicker from './components/ColorPicker';
 import UserLogosGallery from './components/UserLogosGallery';
 import LoginModal from './components/LoginModal';
-import { getAuthState, signOutFromSupabase, AuthState } from './lib/auth';
+import { getAuthState, setAuthState, clearAuthState, AuthState } from './lib/auth';
 
 function App() {
   const [selectedColor, setSelectedColor] = useState('#FE11C5');
@@ -45,14 +45,19 @@ function App() {
     setRefreshGallery(prev => prev + 1);
   }, []);
 
-  const handleLogin = (authState: AuthState) => {
-    setAuthStateLocal(authState);
+  const handleLogin = (username: string) => {
+    const newAuthState: AuthState = {
+      isAuthenticated: true,
+      username: username
+    };
+    setAuthState(newAuthState);
+    setAuthStateLocal(newAuthState);
     setShowLoginModal(false);
   };
 
-  const handleLogout = async () => {
-    await signOutFromSupabase();
-    setAuthStateLocal({ isAuthenticated: false, username: null, supabaseUser: null });
+  const handleLogout = () => {
+    clearAuthState();
+    setAuthStateLocal({ isAuthenticated: false, username: null });
     setShowLoginModal(true);
   };
 

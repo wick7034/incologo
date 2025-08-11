@@ -14,10 +14,7 @@ export interface UserLogo {
   x_username: string;
   logo_colors: {
     background: string;
-    letterI: string;
-    letterN: string;
-    letterC: string;
-    letterO: string;
+    text: string;
     line1: string;
     line2: string;
     line3: string;
