@@ -63,17 +63,14 @@ const LogoCanvas: React.FC<LogoCanvasProps> = ({ selectedColor, onLogoSaved, isA
     if (!username) return;
     
     try {
-      // Use upsert to replace existing logo or create new one
       const { error } = await supabase
         .from('user_logos')
-        .upsert([
+        .insert([
           {
             x_username: username,
             logo_colors: pathColors
           }
-        ], {
-          onConflict: 'x_username'
-        });
+        ]);
 
       if (error) throw error;
       

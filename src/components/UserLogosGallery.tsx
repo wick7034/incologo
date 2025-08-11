@@ -85,17 +85,17 @@ const UserLogosGallery: React.FC = () => {
       <div className="bg-white rounded-2xl shadow-lg p-8">
         <div className="flex items-center gap-3 mb-8">
           <Users className="w-6 h-6 text-purple-600" />
-          <h3 className="text-2xl font-bold text-gray-800">Latest Community Creations</h3>
+          <h3 className="text-2xl font-bold text-gray-800">Community Creations</h3>
           <div className="flex items-center gap-2 ml-auto">
             <Palette className="w-5 h-5 text-gray-500" />
-            <span className="text-gray-600 font-medium">{logos.length} creators</span>
+            <span className="text-gray-600 font-medium">{logos.length} unique designs</span>
           </div>
         </div>
 
         {logos.length === 0 ? (
           <div className="text-center py-12">
             <Palette className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-            <h4 className="text-xl font-medium text-gray-600 mb-2">No creators yet</h4>
+            <h4 className="text-xl font-medium text-gray-600 mb-2">No creations yet</h4>
             <p className="text-gray-500">Be the first to create and share your INCO logo design!</p>
           </div>
         ) : (
@@ -118,7 +118,7 @@ const UserLogosGallery: React.FC = () => {
                       <ExternalLink className="w-4 h-4" />
                     </a>
                     <p className="text-gray-500 text-sm mt-1">
-                      Updated {new Date(logo.updated_at || logo.created_at).toLocaleDateString()}
+                      {new Date(logo.created_at).toLocaleDateString()}
                     </p>
                   </div>
                 </div>
